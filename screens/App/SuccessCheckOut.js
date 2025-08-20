@@ -27,7 +27,7 @@ const SuccessCheckOut = ({navigation}) => {
   )
 }
 
-export default SuccessCheckOut
+export default SuccessCheckOut;
 
 const styles = StyleSheet.create({
   container: {
