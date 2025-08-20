@@ -1,6 +1,5 @@
 import React from 'react'
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
-import SearchComponent from '../components/Search'
 
 const SuccessCheckOut = ({navigation}) => {
 
@@ -28,7 +27,7 @@ const SuccessCheckOut = ({navigation}) => {
   )
 }
 
-export default SuccessCheckOut
+export default SuccessCheckOut;
 
 const styles = StyleSheet.create({
   container: {
