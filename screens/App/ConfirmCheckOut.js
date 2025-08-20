@@ -6,9 +6,13 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { supabase } from "../../config/supabase"; // import supabase client
+import { useSelector, useDispatch } from "react-redux";
+import { clearCart } from "../../reduxtollkit/CartSlice"; // clear cart sau khi order
 
 const ConfirmCheckOut = ({ navigation }) => {
   const [form, setForm] = useState({
@@ -18,12 +22,77 @@ const ConfirmCheckOut = ({ navigation }) => {
     address: "",
   });
 
-  const productInfo = {
-    name: "Mô Hình OnePiece zoro Chiến Đấu Siêu Ngầu Cao : 23.5cm nặng : 1000gram - One Piece - Hộp Màu K17-T4-S7",
-    price: 150000,
-    image:
-      "https://bizweb.dktcdn.net/100/418/981/products/1-2717f3b8-0397-4ab3-8c5b-6bf183ee82b2.jpg?v=1755138997937",
+  const cartItems = useSelector((state) => state.cart.productList);
+  const dispatch = useDispatch();
+
+  const handlePlaceOrder = async () => {
+    try {
+      if (!form.name || !form.email || !form.phone || !form.address) {
+        Alert.alert("Lỗi", "Vui lòng nhập đầy đủ thông tin trước khi đặt hàng");
+        return;
+      }
+
+      // 1. Insert vào bảng orders
+      const totalAmount = cartItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
+
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert([
+          {
+            user_id: 1, // giả sử user_id là 1, sau này có thể lấy từ auth
+            total_amount: totalAmount,
+            status: "Success",
+            order_date: new Date(),
+          },
+        ])
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // 2. Insert vào order_items
+      const orderItems = cartItems.map((item) => ({
+        order_id: order.order_id,
+        product_id: item.id,
+        quantity: item.quantity,
+        price: item.price,
+      }));
+
+      const { error: orderItemsError } = await supabase
+        .from("order_items")
+        .insert(orderItems);
+
+      if (orderItemsError) throw orderItemsError;
+
+      // 3. Insert vào payments
+      const { error: paymentError } = await supabase.from("payments").insert([
+        {
+          order_id: order.order_id,
+          status: "Success",
+          payment_date: new Date(),
+        },
+      ]);
+
+      if (paymentError) throw paymentError;
+
+      // ✅ Xóa giỏ hàng trong redux
+      dispatch(clearCart());
+
+      navigation.navigate("SuccessCheckOut");
+    } catch (err) {
+      console.error("Lỗi đặt hàng:", err);
+      Alert.alert("Lỗi", "Đặt hàng thất bại, vui lòng thử lại!");
+    }
   };
+
+  // ✅ Tính tổng tiền để hiển thị
+  const totalAmount = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   return (
     <View style={styles.container}>
@@ -38,19 +107,25 @@ const ConfirmCheckOut = ({ navigation }) => {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {/* Thông tin sản phẩm */}
-        <View style={styles.productCard}>
-          <Image
-            source={{ uri: productInfo.image }}
-            style={styles.productImage}
-            resizeMode="cover"
-          />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.productName}>{productInfo.name}</Text>
-            <Text style={styles.productPrice}>
-              {productInfo.price.toLocaleString()}đ
-            </Text>
+        {/* ✅ Danh sách sản phẩm */}
+        {cartItems.map((item) => (
+          <View key={item.id} style={styles.productCard}>
+            <Image source={{ uri: item.image }} style={styles.productImage} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.productName} numberOfLines={2}>
+                {item.name}
+              </Text>
+              <Text style={styles.productPrice}>
+                {item.price.toLocaleString()}đ x {item.quantity}
+              </Text>
+            </View>
           </View>
+        ))}
+
+        {/* ✅ Tổng tiền */}
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalLabel}>Tổng tiền:</Text>
+          <Text style={styles.totalValue}>{totalAmount.toLocaleString()}đ</Text>
         </View>
 
         {/* Form nhập thông tin */}
@@ -87,7 +162,11 @@ const ConfirmCheckOut = ({ navigation }) => {
 
       {/* Nút đặt hàng */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.buttonOrder} activeOpacity={0.7} onPress={() => navigation.navigate("SuccessCheckOut")}>
+        <TouchableOpacity
+          style={styles.buttonOrder}
+          activeOpacity={0.7}
+          onPress={handlePlaceOrder}
+        >
           <Text style={styles.textButton}>Đặt hàng</Text>
         </TouchableOpacity>
       </View>
@@ -106,7 +185,32 @@ const styles = StyleSheet.create({
     height: 80,
   },
   arrowBack: { fontSize: 25, color: "#fff", paddingLeft: "5%" },
-  title: { fontSize: 32, fontWeight: "bold", color: "#fff", marginLeft: '2%',  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#fff",
+    marginLeft: "2%",
+  },
+
+  // ✅ style tổng tiền
+  totalContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderTopWidth: 1,
+    borderColor: "#FFC107",
+    paddingVertical: 12,
+    marginBottom: 16,
+    shadowColor: "#FFC107",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+  },
+  totalLabel: { fontSize: 18, fontWeight: "600", color: "#4C4C4C" },
+  totalValue: { fontSize: 18, fontWeight: "bold", color: "#E53935" },
 
   productCard: {
     flexDirection: "row",
@@ -123,22 +227,27 @@ const styles = StyleSheet.create({
   },
   productImage: { width: 80, height: 80, borderRadius: 10, marginRight: 12 },
   productName: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: "600",
     color: "#4C4C4C",
     marginBottom: 6,
   },
-  productPrice: { fontSize: 16, fontWeight: "bold", color: "#41B100" },
+  productPrice: { fontSize: 14, fontWeight: "bold", color: "#41B100" },
 
   formContainer: { marginTop: 10 },
   input: {
     borderWidth: 1,
-    borderColor: "#BDBDBD",
+    borderColor: "#FFC107",
     borderRadius: 10,
     padding: 12,
     marginBottom: 12,
     fontSize: 16,
     backgroundColor: "#FAFAFA",
+    shadowColor: "#FFC107",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 3,
   },
 
   footer: { padding: 16 },

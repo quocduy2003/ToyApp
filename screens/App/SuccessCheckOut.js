@@ -19,7 +19,7 @@ const SuccessCheckOut = ({navigation}) => {
       <TouchableOpacity
         style={styles.buttonBack}
         activeOpacity={0.7}
-        onPress={() => navigation.navigate("Card")}
+        onPress={() => navigation.navigate("Home")}
       >
         <Text style={styles.textButton}>Quay lại</Text>
       </TouchableOpacity>

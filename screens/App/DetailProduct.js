@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
-import Navbar from '../components/Navbar';
+import Navbar from '../../components/Navbar';
 import { Ionicons } from '@expo/vector-icons'; // Nếu chưa có, dùng icon mặc định
 const PRIMARY_COLOR = '#FFC107';
 
-const ProductDetail = ({ route, navigation }) => {
+const DetailProduct = ({ route, navigation }) => {
 
   const sampleProduct = {
     name: 'Xe Đồ Chơi Điều Khiển',
@@ -202,4 +202,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductDetail;
+export default DetailProduct;
