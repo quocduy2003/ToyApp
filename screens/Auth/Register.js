@@ -1,48 +1,66 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { registerUser } from '../../reduxtollkit/UserSlice'; // với Register.js
-
+import { supabase } from '../../config/supabase';
 const PRIMARY_COLOR = "#FFC107";
 
-const Register = ({ navigation }) => {
-    const dispatch = useDispatch();
-    const { loading, error, user } = useSelector(state => state.user);
+// Hàm hash mật khẩu (giả định, bạn cần tích hợp thư viện như bcrypt)
 
+const Register = ({ navigation }) => {
     const [full_name, setFull_name] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
-    const [password_hash, setPassword_hash] = useState("");
+    const [password, setPassword] = useState("");
+    const [address, setAddress] = useState(""); // Thêm trường address
 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    // const handleRegister = async () => {
-    //     try {
-    //         const response = await fetch("http://localhost:3000/api/register", {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify({ full_name, phone, email, password_hash })
-    //         });
-    //         const result = await response.json();
-    //         if (response.ok) {
-    //             alert("Đăng ký thành công");
-    //             navigation.navigate("Login");
-    //         } else {
-    //             alert("Lỗi: " + (result.message || "Đăng ký thất bại"));
-    //         }
-    //     } catch (err) {
-    //         alert("Lỗi: " + err.message);
-    //     }
-    // };
-    useEffect(() => {
-        if (user) {
-            alert("Đăng ký thành công");
-            navigation.navigate("Login");
+const handleRegister = async () => {
+    setError("");
+    if (!email || !password || !full_name || !phone || !address) {
+        setError("Vui lòng nhập đầy đủ thông tin!");
+        return;
+    }
+
+    try {
+        setLoading(true);
+        const { data, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name,
+                    phone,
+                    address,
+                },
+            },
+        });
+
+        if (signUpError) {
+            setError(signUpError.message);
+        } else {
+            // Sau khi đăng ký thành công, insert vào bảng users
+            const { error: insertError } = await supabase.from('users').insert({
+                full_name,
+                email,
+                phone,
+                address,
+                created_at: new Date().toISOString(),
+            });
+
+            if (insertError) {
+                setError(insertError.message);
+            } else {
+                alert("Thành công", "Đăng ký thành công, vui lòng kiểm tra email để xác nhận!");
+                navigation.navigate("Login");
+            }
         }
-    }, [user]);
-
-    const handleRegister = () => {
-        dispatch(registerUser({ full_name, phone, email, password_hash }));
-    };
+    } catch (err) {
+        setError(err.message);
+    } finally {
+        setLoading(false);
+    }
+};
 
     return (
         <View style={styles.container}>
@@ -54,7 +72,7 @@ const Register = ({ navigation }) => {
                 <View style={styles.body}>
                     <View style={styles.boxText}>
                         <TextInput
-                            placeholder="Nhập Tài khoản"
+                            placeholder="Nhập Họ và tên"
                             placeholderTextColor="#fff"
                             style={styles.inputText}
                             value={full_name}
@@ -75,7 +93,7 @@ const Register = ({ navigation }) => {
 
                     <View style={styles.boxText}>
                         <TextInput
-                            placeholder="Nhập Emai"
+                            placeholder="Nhập Email"
                             placeholderTextColor="#fff"
                             keyboardType="email-address"
                             style={styles.inputText}
@@ -86,18 +104,30 @@ const Register = ({ navigation }) => {
 
                     <View style={styles.boxText}>
                         <TextInput
+                            placeholder="Nhập Địa chỉ"
+                            placeholderTextColor="#fff"
+                            style={styles.inputText}
+                            value={address}
+                            onChangeText={setAddress}
+                        />
+                    </View>
+
+                    <View style={styles.boxText}>
+                        <TextInput
                             placeholder="Nhập Mật khẩu"
                             placeholderTextColor="#fff"
                             secureTextEntry={true}
                             style={styles.inputText}
-                            value={password_hash}
-                            onChangeText={setPassword_hash}
+                            value={password}
+                            onChangeText={setPassword}
                         />
                     </View>
 
-                    <TouchableOpacity style={styles.boxTextLogin} onPress={handleRegister}>
-                        <Text style={styles.bodyTextLogin}>Sign up</Text>
+                    <TouchableOpacity style={styles.boxTextLogin} onPress={handleRegister} disabled={loading}>
+                        <Text style={styles.bodyTextLogin}>{loading ? "Đang xử lý..." : "Sign up"}</Text>
                     </TouchableOpacity>
+
+                    {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
 
                     <TouchableOpacity
                         style={styles.switchMode}
@@ -109,8 +139,6 @@ const Register = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            {loading && <Text>Đang xử lý...</Text>}
-            {error && <Text style={{ color: 'red' }}>{error}</Text>}
         </View>
     );
 };

@@ -5,7 +5,7 @@ import MyCarousel from '../../components/Home/Carousel'
 import CardIteam from '../../components/Home/CardIteam'
 import { useSelector, useDispatch } from 'react-redux'
 import { getAllProduct } from '../../reduxtollkit/ProductSlice'
-import { getCategories } from '../../reduxtollkit/CatagorySlice'
+import { fetchCategories } from '../../reduxtollkit/CatagorySlice'
 
 
 const Home = () => {
@@ -24,7 +24,7 @@ const Home = () => {
   ];
 
   useEffect(() => {
-    dispatch(getCategories())
+    dispatch(fetchCategories())
   }, [dispatch]);
 
   useEffect(() => {
@@ -49,11 +49,12 @@ const Home = () => {
         <View style={{ height: 100, marginTop: 10 }}>
           <FlatList
             style={{ paddingHorizontal: 8 }}
-            data={categories}
+            data={categoriesToShow}
             keyExtractor={(item) => item.id}
-            horizontal
+            numColumns={4}
+            scrollEnabled={false}
             renderItem={renderCategory}
-            showsHorizontalScrollIndicator={false}
+
           />
         </View>
 
@@ -67,7 +68,7 @@ const Home = () => {
               <CardIteam imageUrl={item.image} name={item.name} price={item.price} />
             )}
             columnWrapperStyle={styles.row}
-            scrollEnabled={false} 
+            scrollEnabled={false}
           />
         </View>
       </ScrollView>
