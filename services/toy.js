@@ -5,6 +5,7 @@ export const getToys = async () => {
   const { data, error } = await supabase.from('products').select('*');
   if (error) throw error;
   return data;
+  
 };  
 
 // get toy by id
@@ -13,3 +14,11 @@ export const getToyById = async (id) => {
   if (error) throw error;
   return data;
 };
+
+
+//get catagory
+export const getCategories = async () => {
+  const {data, error} = await supabase.from('categories').select('*');
+  if (error) throw error;
+  return data;
+}
