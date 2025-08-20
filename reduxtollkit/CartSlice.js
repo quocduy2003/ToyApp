@@ -1,26 +1,22 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { fetchProducts } from "../services/toy";
+
+// Async thunk gọi API
+export const getProducts = createAsyncThunk("cart/getProducts", async () => {
+  const data = await fetchProducts();
+  // thêm quantity mặc định = 1 cho từng sản phẩm
+  return data.map((item) => ({
+    ...item,
+    quantity: 1,
+  }));
+});
 
 const CartSlice = createSlice({
   name: "cart",
   initialState: {
-    productList: [
-      {
-        id: "1",
-        name: "Mô Hình OnePiece zoro Chiến Đấu Siêu Ngầu Cao : 33cm nặng : 1000gram - One Piece - Hộp Carton -K14-T4-S3",
-        price: 100000,
-        quantity: 1,
-        image:
-          "https://bizweb.dktcdn.net/100/418/981/products/1-a5c3dbe3-1a34-4618-b43e-104276627c3c.jpg?v=1755068078660",
-      },
-      {
-        id: "2",
-        name: "Mô Hình OnePiece zoro Chiến Đấu Siêu Ngầu Cao : 23.5cm nặng : 1000gram - One Piece - Hộp Màu K17-T4-S7",
-        price: 150000,
-        quantity: 1,
-        image:
-          "https://bizweb.dktcdn.net/100/418/981/products/1-2717f3b8-0397-4ab3-8c5b-6bf183ee82b2.jpg?v=1755138997937",
-      },
-    ],
+    productList: [],
+    loading: false,
+    error: null,
   },
   reducers: {
     increaseQuantity: (state, action) => {
@@ -39,6 +35,21 @@ const CartSlice = createSlice({
     clearCart: (state) => {
       state.productList = [];
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.productList = action.payload;
+      })
+      .addCase(getProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 

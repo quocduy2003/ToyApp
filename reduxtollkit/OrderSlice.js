@@ -1,20 +1,26 @@
 // src/redux/orderSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createOrder } from "../services/orderService";
 
-// async thunk: giả lập gửi dữ liệu order lên server
 export const placeOrderThunk = createAsyncThunk(
   "order/placeOrder",
-  async (orderData, { rejectWithValue }) => {
+  async ({ form, cartItems }, { rejectWithValue }) => {
     try {
-      // Ở đây có thể gọi API thật, ví dụ:
-      // const res = await axios.post("http://localhost:3000/api/orders", orderData);
-      // return res.data;
+      // Tính tổng tiền
+      const total_amount = cartItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
 
-      // Demo giả lập
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return orderData;
+      // Tạo order + order_items
+      const order = await createOrder(
+        { user_id: form.user_id, total_amount },
+        cartItems
+      );
+
+      return order;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Đặt hàng thất bại");
+      return rejectWithValue(error.message || "Đặt hàng thất bại");
     }
   }
 );
@@ -23,16 +29,11 @@ const OrderSlice = createSlice({
   name: "order",
   initialState: {
     form: {
+      user_id: null,
       name: "",
       email: "",
       phone: "",
       address: "",
-    },
-    product: {
-      name: "Mô Hình OnePiece zoro Chiến Đấu Siêu Ngầu Cao : 23.5cm nặng : 1000gram - One Piece - Hộp Màu K17-T4-S7",
-      price: 150000,
-      image:
-        "https://bizweb.dktcdn.net/100/418/981/products/1-2717f3b8-0397-4ab3-8c5b-6bf183ee82b2.jpg?v=1755138997937",
     },
     loading: false,
     error: null,
@@ -50,7 +51,7 @@ const OrderSlice = createSlice({
       })
       .addCase(placeOrderThunk.fulfilled, (state, action) => {
         state.loading = false;
-        console.log("Đặt hàng thành công:", action.payload);
+        console.log("✅ Đặt hàng thành công:", action.payload);
       })
       .addCase(placeOrderThunk.rejected, (state, action) => {
         state.loading = false;

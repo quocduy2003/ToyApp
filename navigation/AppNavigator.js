@@ -1,9 +1,8 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Card from "../screens/App/Card";
+import Cart from "../screens/App/Cart";
 import ConfirmCheckOut from "../screens/App/ConfirmCheckOut";
 import SuccessCheckOut from "../screens/App/SuccessCheckOut";
-import Navbar from "../components/Navbar";
 import Home from "../screens/App/Home";
 
 
