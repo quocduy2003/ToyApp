@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Dimensions, Image, StyleSheet, View } from "react-native";
+import { Dimensions, Image, StyleSheet, View, LogBox } from "react-native";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
 import { useSharedValue, useDerivedValue, runOnJS } from "react-native-reanimated";
-
+LogBox.ignoreLogs([
+    '[Reanimated]',   // ví dụ warning Reanimated
+    'VirtualizedLists should never be nested',
+]);
 const { width } = Dimensions.get("window");
 
 const MyCarousel = ({ data }) => {
@@ -26,7 +29,7 @@ const MyCarousel = ({ data }) => {
                     // Cập nhật progress trong worklet
                     progress.value = absProgress;
                 }}
-                mode="parallax" 
+                mode="parallax"
                 modeConfig={{
                     parallaxScrollingScale: 0.9,  // scale ảnh giữa
                     parallaxScrollingOffset: 50,  // độ lệch hai bên
@@ -37,19 +40,19 @@ const MyCarousel = ({ data }) => {
             />
 
 
-            <Pagination.Basic
+            {/* <Pagination.Basic
                 progress={derivedProgress}
                 data={data}
                 dotStyle={styles.dot}
                 activeDotStyle={styles.activeDot}
-            />
-        </View>
+            /> */}
+        </View> 
     );
 };
 
 export default MyCarousel;
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({ 
     image: {
         width: "100%",
         height: 180,

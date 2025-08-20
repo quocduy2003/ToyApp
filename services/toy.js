@@ -1,6 +1,20 @@
 import { supabase } from '../config/supabase';
 
-// lấy toàn bộ sản phẩm
+// get all toys
+export const getToys = async () => {
+  const { data, error } = await supabase.from('products').select('*');
+  if (error) throw error;
+  return data;
+  
+};  
+
+// get toy by id
+export const getToyById = async (id) => {
+  const { data, error } = await supabase.from('toys').select('*').eq('id', id).single();
+  if (error) throw error;
+  return data;
+};
+
 export const fetchProducts = async () => {
   const { data, error } = await supabase.from("products").select("*");
   if (error) throw error;
@@ -17,3 +31,10 @@ export const fetchProductById = async (id) => {
   if (error) throw error;
   return data;
 };
+
+
+export const getCategories = async () => {
+  const {data, error} = await supabase.from('categories').select('*');
+  if (error) throw error;
+  return data;
+}

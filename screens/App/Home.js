@@ -1,49 +1,76 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, ScrollView } from 'react-native'
+import React, { use, useEffect, useState } from 'react'
 import IntroHeader from '../../components/Home/IntroHeader'
 import MyCarousel from '../../components/Home/Carousel'
 import CardIteam from '../../components/Home/CardIteam'
 import { useSelector, useDispatch } from 'react-redux'
 import { getAllProduct } from '../../reduxtollkit/ProductSlice'
+import { getCategories } from '../../reduxtollkit/CatagorySlice'
+
+
 const Home = () => {
   const dispatch = useDispatch();
-  const dataProduct = useSelector((store) => store.products);
+  const dataProduct = useSelector((store) => store.products.items);
+  const dataCategories = useSelector((store) => store.categories.items);
+  const categoriesToShow = [
+    ...dataCategories.slice(0, 3), // lấy 3 category đầu tiên
+    { id: "all", name: "Tất cả", image: "https://cdn-icons-png.flaticon.com/512/1828/1828778.png" }
+  ];
   const data = [
     { id: 1, image: "https://picsum.photos/600/400?1" },
     { id: 2, image: "https://picsum.photos/600/400?2" },
     { id: 3, image: "https://picsum.photos/600/400?3" },
     { id: 4, image: "https://picsum.photos/600/400?4" },
   ];
-  const categories = [
-    { id: "1", name: "Lego", image: "https://www.thiings.co/_next/image?url=https%3A%2F%2Flftz25oez4aqbxpq.public.blob.vercel-storage.com%2Fimage-4co39hUWEJP0hqqTJ69PaM8SxEYwYC.png&w=500&q=75" },
-    { id: "2", name: "Robot", image: "https://www.thiings.co/_next/image?url=https%3A%2F%2Flftz25oez4aqbxpq.public.blob.vercel-storage.com%2Fimage-JLGCwuVRfvOMwVMpimP9wXFiu6Nw4x.png&w=160&q=75" },
-    { id: "3", name: "Xe hơi", image: "https://www.thiings.co/_next/image?url=https%3A%2F%2Flftz25oez4aqbxpq.public.blob.vercel-storage.com%2Fimage-JLGCwuVRfvOMwVMpimP9wXFiu6Nw4x.png&w=160&q=75" },
-    { id: "4", name: "Búp bê", image: "https://www.thiings.co/_next/image?url=https%3A%2F%2Flftz25oez4aqbxpq.public.blob.vercel-storage.com%2Fimage-JLGCwuVRfvOMwVMpimP9wXFiu6Nw4x.png&w=160&q=75" },
-    { id: "5", name: "Board Game", image: "https://www.thiings.co/_next/image?url=https%3A%2F%2Flftz25oez4aqbxpq.public.blob.vercel-storage.com%2Fimage-JLGCwuVRfvOMwVMpimP9wXFiu6Nw4x.png&w=160&q=75" },
-  ];
+
+  useEffect(() => {
+    dispatch(getCategories())
+  }, [dispatch]);
+
   useEffect(() => {
     dispatch(getAllProduct())
-  },[dispatch]);
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
-    >
-      <Image style={{ width: 45, height: 45 }} source={{ uri: "https://www.thiings.co/_next/image?url=https%3A%2F%2Flftz25oez4aqbxpq.public.blob.vercel-storage.com%2Fimage-4co39hUWEJP0hqqTJ69PaM8SxEYwYC.png&w=500&q=75" }} />
+  }, [dispatch]);
+
+  const renderCategory = ({ item }) => (
+    <TouchableOpacity style={styles.card}>
+      <Image style={{ width: 45, height: 45 }} source={{ uri: item.image }} />
       <Text style={styles.title}>{item.name}</Text>
     </TouchableOpacity>
   );
+
   return (
     <View style={{ flex: 1 }}>
+
       <IntroHeader />
-      <MyCarousel data={data} />
-      <FlatList
-        style={{ marginTop: 10, paddingHorizontal: 8, height: 100 }}
-        data={categories}
-        keyExtractor={(item) => item.id}
-        horizontal={true}
-        renderItem={renderItem}
-        showsVerticalScrollIndicator={false}
-      />
+
+      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+        <MyCarousel data={data} />
+
+        <View style={{ height: 100, marginTop: 10 }}>
+          <FlatList
+            style={{ paddingHorizontal: 8 }}
+            data={categories}
+            keyExtractor={(item) => item.id}
+            horizontal
+            renderItem={renderCategory}
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+
+        <View style={{ paddingHorizontal: 8, marginTop: 10 }}>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Sản phẩm mới</Text>
+          <FlatList
+            data={dataProduct}
+            numColumns={2}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <CardIteam imageUrl={item.image} name={item.name} price={item.price} />
+            )}
+            columnWrapperStyle={styles.row}
+            scrollEnabled={false} 
+          />
+        </View>
+      </ScrollView>
     </View>
   )
 }
@@ -57,22 +84,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 16,
     marginRight: 10,
-    display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
     elevation: 5,
   },
   title: {
     fontSize: 12,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  row: {
+    justifyContent: 'space-between'
   }
 })

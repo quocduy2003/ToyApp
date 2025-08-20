@@ -2,16 +2,15 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getToys } from "../services/toy";
 
 const initialState = {
-    product: []
+    items: [],
+    status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
 }
 
 export const getAllProduct = createAsyncThunk(
     '/products/getAll',
     async () => {
-        const { data, error } = await getToys();
-        if (error) {
-            throw new Error(error.message);
-        }
+        const data = await getToys();
+        // console.log("getAllProduct", data);
         return data;
     }
 )
@@ -28,6 +27,7 @@ const productSlice = createSlice({
             .addCase(getAllProduct.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.items = action.payload;
+                // console.log("getAllProduct fulfilled", state.items );
             })
             .addCase(getAllProduct.rejected, (state) => {
                 state.status = 'failed';
