@@ -1,16 +1,15 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import ProductStack from "./navigation/AppNavigator";
 import { Provider } from "react-redux";
 import store from "./reduxtollkit/store";
-
+import RootNavigator from "./navigation/RootNavigator";
 export default function App() {
   return (
     <Provider store={store}>
       <View style={styles.container}>
         <NavigationContainer>
-          <ProductStack />
+          <RootNavigator />
         </NavigationContainer>
       </View>
     </Provider>

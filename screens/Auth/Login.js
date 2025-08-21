@@ -1,47 +1,45 @@
-import React, { useState ,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from '../../reduxtollkit/UserSlice'; // với Login.js
-
+import { supabase } from '../../config/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PRIMARY_COLOR = "#FFC107";
 
 const Login = ({ navigation }) => {
-    const dispatch = useDispatch();
-    const { loading, error, isLoggedIn } = useSelector(state => state.user);
-    const [email, setEmail] = useState("");
-    const [password_hash, setPassword_hash] = useState("");
+    const [email, setEmail] = useState(""); // Sử dụng email thay vì username
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
-    useEffect(() => {
-        if (isLoggedIn) {
-            alert("Đăng nhập thành công");
-            navigation.navigate("Card"); // hoặc trang bạn muốn
+    const handleLogin = async () => {
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) {
+                setError(error.message);
+                return;
+            }
+
+            const session = data.session;
+            const expiresAt = new Date().getTime() + 3 * 24 * 60 * 60 * 1000; // 2.5 giờ
+            console.log('expiresAt:', expiresAt);
+            await AsyncStorage.setItem(
+                "customSession",
+                JSON.stringify({ access_token: session.access_token, expiresAt })
+            );
+
+            navigation.navigate("Home");
+        } catch (err) {
+            setError("Lỗi kết nối. Vui lòng thử lại.");
+            console.error("Login error:", err);
         }
-    }, [isLoggedIn]);
-
-    const handleLogin = () => {
-        dispatch(loginUser({ email: email, password_hash }));
     };
-    // const handleLogin = async () => {
-    //     try {
-    //         // Nếu backend yêu cầu email, bạn cần nhập email thay vì username
-    //         const response = await fetch("http://localhost:3000/api/login", {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify({ email: email, password_hash })
-    //         });
-    //         const result = await response.json();
-    //         if (response.ok) {
-    //             alert("Đăng nhập thành công");
-    //             // Chuyển hướng sang Home hoặc lưu thông tin user tuỳ ý
-    //             navigation.navigate("Card");
-    //         } else {
-    //             alert("Lỗi: " + (result.message || "Đăng nhập thất bại"));
-    //         }
-    //     } catch (err) {
-    //         alert("Lỗi: " + err.message);
-    //     }
-    // };
+
+
+
 
     return (
         <View style={styles.container}>
@@ -58,6 +56,7 @@ const Login = ({ navigation }) => {
                             style={styles.inputText}
                             value={email}
                             onChangeText={setEmail}
+                            keyboardType="email-address"
                         />
                     </View>
                     <View style={styles.boxText}>
@@ -66,8 +65,8 @@ const Login = ({ navigation }) => {
                             placeholderTextColor="#fff"
                             secureTextEntry={true}
                             style={styles.inputText}
-                            value={password_hash}
-                            onChangeText={setPassword_hash}
+                            value={password}
+                            onChangeText={setPassword}
                         />
                     </View>
 
@@ -85,7 +84,6 @@ const Login = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            {loading && <Text>Đang xử lý...</Text>}
             {error && <Text style={{ color: 'red' }}>{error}</Text>}
         </View>
     );

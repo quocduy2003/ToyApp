@@ -32,9 +32,3 @@ export const fetchProductById = async (id) => {
   return data;
 };
 
-
-export const getCategories = async () => {
-  const {data, error} = await supabase.from('categories').select('*');
-  if (error) throw error;
-  return data;
-}

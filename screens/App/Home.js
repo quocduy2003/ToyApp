@@ -1,14 +1,14 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native'
 import React, { use, useEffect, useState } from 'react'
 import IntroHeader from '../../components/Home/IntroHeader'
 import MyCarousel from '../../components/Home/Carousel'
 import CardIteam from '../../components/Home/CardIteam'
 import { useSelector, useDispatch } from 'react-redux'
 import { getAllProduct } from '../../reduxtollkit/ProductSlice'
-import { getCategories } from '../../reduxtollkit/CatagorySlice'
+import { fetchCategories } from '../../reduxtollkit/CategorySlice'
 
 
-const Home = () => {
+const Home = ({ navigation }) => {
   const dispatch = useDispatch();
   const dataProduct = useSelector((store) => store.products.items);
   const dataCategories = useSelector((store) => store.categories.items);
@@ -24,7 +24,7 @@ const Home = () => {
   ];
 
   useEffect(() => {
-    dispatch(getCategories())
+    dispatch(fetchCategories())
   }, [dispatch]);
 
   useEffect(() => {
@@ -44,15 +44,19 @@ const Home = () => {
       <IntroHeader />
 
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+
+
         <MyCarousel data={data} />
 
         <View style={{ height: 100, marginTop: 10 }}>
           <FlatList
             style={{ paddingHorizontal: 8 }}
+            data={categoriesToShow}
             keyExtractor={(item) => item.id}
-            horizontal
+            numColumns={4}
+            scrollEnabled={false}
             renderItem={renderCategory}
-            showsHorizontalScrollIndicator={false}
+
           />
         </View>
 
@@ -63,10 +67,12 @@ const Home = () => {
             numColumns={2}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
-              <CardIteam imageUrl={item.image} name={item.name} price={item.price} />
+              <TouchableOpacity onPress={() => navigation.navigate('ProductDetail', { id: item.id })}>
+                <CardIteam imageUrl={item.image} name={item.name} price={item.price} />
+              </TouchableOpacity>
             )}
             columnWrapperStyle={styles.row}
-            scrollEnabled={false} 
+            scrollEnabled={false}
           />
         </View>
       </ScrollView>
@@ -94,6 +100,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   row: {
-    justifyContent: 'space-between'
-  }
+    justifyContent: 'space-around'
+  },
+
 })
