@@ -6,6 +6,7 @@ import SuccessCheckOut from "../screens/App/SuccessCheckOut";
 import ProductDetail from "../screens/App/DetailProduct";
 import Home from "../screens/App/Home";
 import SearchScrean from "../screens/App/SearchScrean";
+import SearchResults from "../screens/App/SearchResults";
 
 
 const Stack = createNativeStackNavigator();
@@ -19,6 +20,7 @@ const AppNavigator = () => {
       <Stack.Screen name="ProductDetail"  component={ProductDetail} />
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="SearchScrean" component={SearchScrean} />
+      <Stack.Screen name="ResultScreen" component={SearchResults} />
     </Stack.Navigator>
   );
 };

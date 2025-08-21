@@ -19,6 +19,7 @@ export default function RootNavigator() {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session) {
                     // Kiểm tra thời gian hết hạn thủ công (nếu cần)
+                    console.log('session:', session);
                     const storedSession = await AsyncStorage.getItem("customSession");
                     if (storedSession) {
                         const { expiresAt } = JSON.parse(storedSession);
