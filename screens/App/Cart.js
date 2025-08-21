@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   FlatList,
   StyleSheet,
@@ -11,7 +11,6 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import Navbar from "../../components/Navbar";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getProducts,
   increaseQuantity,
   decreaseQuantity,
   removeItem,
@@ -19,14 +18,7 @@ import {
 
 const Cart = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { productList, loading, error } = useSelector((state) => state.cart);
-
-  useEffect(() => {
-    dispatch(getProducts()); // load dữ liệu từ Supabase khi vào giỏ hàng
-  }, [dispatch]);
-
-  if (loading) return <Text>Đang tải dữ liệu...</Text>;
-  if (error) return <Text>Lỗi: {error}</Text>;
+  const { productList } = useSelector((state) => state.cart);
 
   return (
     <View style={styles.container}>
@@ -44,85 +36,102 @@ const Cart = ({ navigation }) => {
 
       {/* Danh sách sản phẩm */}
       <View style={styles.bodyContainer}>
-        <FlatList
-          data={productList}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.cardItem}>
-              <Image source={{ uri: item.image }} style={styles.productImage} />
+        {productList.length === 0 ? (
+          <Text style={{ textAlign: "center", marginTop: 20, fontSize: 16 }}>
+            Giỏ hàng của bạn đang trống
+          </Text>
+        ) : (
+          <FlatList
+            data={productList}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.cardItem}>
+                <Image source={{ uri: item.image }} style={styles.productImage} />
 
-              <View style={styles.cardContent}>
-                <View style={styles.bodyContent}>
-                  <Text style={styles.nameProdcut} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
-                  <Text style={styles.totalPriceProdcut}>
-                    {(item.price * item.quantity).toLocaleString()}đ
-                  </Text>
-                </View>
-
-                <View>
-                  <Text style={styles.priceProdcut}>
-                    {item.price.toLocaleString()}đ
-                  </Text>
-                </View>
-
-                <View style={styles.buttonContainer}>
-                  <View style={styles.operatorContainer}>
-                    <TouchableOpacity
-                      style={styles.pressIncreaseOperatorContainer}
-                      onPress={() => dispatch(decreaseQuantity(item.id))}
+                <View style={styles.cardContent}>
+                  <View style={styles.bodyContent}>
+                    <Text
+                      style={styles.nameProdcut}
+                      numberOfLines={2}
+                      ellipsizeMode="tail"
                     >
-                      <Text>-</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.quantity}>{item.quantity}</Text>
-                    <TouchableOpacity
-                      style={styles.pressDecreaseOperatorContainer}
-                      onPress={() => dispatch(increaseQuantity(item.id))}
-                    >
-                      <Text>+</Text>
-                    </TouchableOpacity>
+                      {item.name}
+                    </Text>
+                    <Text style={styles.totalPriceProdcut}>
+                      {(item.price * item.quantity).toLocaleString()}đ
+                    </Text>
                   </View>
-                  <View style={styles.deleteContainer}>
-                    <TouchableOpacity
-                      style={styles.pressDeleteOperatorContainer}
-                      onPress={() => dispatch(removeItem(item.id))}
-                    >
-                      <Text style={styles.textDelete}>Xoá</Text>
-                    </TouchableOpacity>
+
+                  <View>
+                    <Text style={styles.priceProdcut}>
+                      {item.price.toLocaleString()}đ
+                    </Text>
+                  </View>
+
+                  <View style={styles.buttonContainer}>
+                    <View style={styles.operatorContainer}>
+                      <TouchableOpacity
+                        style={styles.pressIncreaseOperatorContainer}
+                        onPress={() => dispatch(decreaseQuantity(item.id))}
+                      >
+                        <Text>-</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.quantity}>{item.quantity}</Text>
+                      <TouchableOpacity
+                        style={styles.pressDecreaseOperatorContainer}
+                        onPress={() => dispatch(increaseQuantity(item.id))}
+                      >
+                        <Text>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.deleteContainer}>
+                      <TouchableOpacity
+                        style={styles.pressDeleteOperatorContainer}
+                        onPress={() => dispatch(removeItem(item.id))}
+                      >
+                        <Text style={styles.textDelete}>Xoá</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               </View>
-            </View>
-          )}
-        />
+            )}
+          />
+        )}
       </View>
 
       {/* Footer */}
-      <View style={styles.footerContainer}>
-        <View style={styles.paymentTextContainer}>
-          <Text style={styles.paymentText}>Tổng</Text>
-          <Text style={styles.paymentText}>
-            {productList
-              .reduce((sum, item) => sum + item.price * item.quantity, 0)
-              .toLocaleString()}
-            đ
-          </Text>
-        </View>
-      </View>
+      {productList.length > 0 && (
+        <>
+          <View style={styles.footerContainer}>
+            <View style={styles.paymentTextContainer}>
+              <Text style={styles.paymentText}>Tổng</Text>
+              <Text style={styles.paymentText}>
+                {productList
+                  .reduce((sum, item) => sum + item.price * item.quantity, 0)
+                  .toLocaleString()}
+                đ
+              </Text>
+            </View>
+          </View>
 
-      <View style={styles.paymentContainer}>
-        <TouchableOpacity
-          style={styles.buttonPaymentContainer}
-          activeOpacity={0.1}
-          onPress={() => navigation.navigate("ConfirmCheckOut")}
-        >
-          <Text style={styles.buttonPayment}>Thanh toán</Text>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.paymentContainer}>
+            <TouchableOpacity
+              style={styles.buttonPaymentContainer}
+              activeOpacity={0.1}
+              onPress={() => navigation.navigate("ConfirmCheckOut")}
+            >
+              <Text style={styles.buttonPayment}>Thanh toán</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
 
       <Navbar />
     </View>
   );
 };
+
 
 export default Cart;
 
@@ -165,7 +174,7 @@ const styles = StyleSheet.create({
   elevation: 2,
   borderWidth: 1,
   borderColor: "#FFC107",
-  height: 100, // ✅ chiều cao cố định cho mỗi cart item
+  height: 130, // ✅ chiều cao cố định cho mỗi cart item
 },
 productImage: {
   width: 70,
@@ -213,8 +222,8 @@ productImage: {
   pressIncreaseOperatorContainer: {
     justifyContent: "center",
     alignItems: "center",
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     backgroundColor: "#fff",
     borderBottomLeftRadius: 10,
     borderTopLeftRadius: 10,
@@ -224,8 +233,8 @@ productImage: {
   pressDecreaseOperatorContainer: {
     justifyContent: "center",
     alignItems: "center",
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     backgroundColor: "#fff",
     borderBottomRightRadius: 10,
     borderTopRightRadius: 10,
@@ -235,9 +244,9 @@ productImage: {
   quantity: {
     fontSize: 16,
     textAlign: "center",
-    width: 50,
-    height: 40,
-    lineHeight: 40,
+    width: 35,
+    height: 35,
+    lineHeight: 35,
     borderWidth: 1,
     borderColor: "#BDBDBD",
     backgroundColor: "#fff",

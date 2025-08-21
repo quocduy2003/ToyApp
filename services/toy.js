@@ -33,12 +33,6 @@ export const fetchProductById = async (id) => {
 };
 
 
-export const getCategories = async () => {
-  const { data, error } = await supabase.from('categories').select('*');
-  // console.log('categories:', data);
-  if (error) throw error;
-  return data;
-}
 
 export const searchToys = async (keyword) => {
   const trimmedKeyword = keyword.trim().toLowerCase();
