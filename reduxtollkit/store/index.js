@@ -4,13 +4,13 @@ import OrderSlice from '../OrderSlice';
 import CartSlice from '../CartSlice';
 import categoryReducer from '../CatagorySlice';
 const store = configureStore({
-    reducer: {
-        products: productReducer,
-        order: OrderSlice,
-        cart: CartSlice,
-      categories: categoryReducer
+  reducer: {
+    products: productReducer,
+    order: OrderSlice,
+    cart: CartSlice,
+    categories: categoryReducer
 
-    },
+  },
 });
 
 export default store;

@@ -25,6 +25,7 @@ const Login = ({ navigation }) => {
 
             const session = data.session;
             const expiresAt = new Date().getTime() + 3 * 24 * 60 * 60 * 1000; // 2.5 giờ
+            console.log('expiresAt:', expiresAt);
             await AsyncStorage.setItem(
                 "customSession",
                 JSON.stringify({ access_token: session.access_token, expiresAt })

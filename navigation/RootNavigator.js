@@ -22,6 +22,7 @@ export default function RootNavigator() {
                     const storedSession = await AsyncStorage.getItem("customSession");
                     if (storedSession) {
                         const { expiresAt } = JSON.parse(storedSession);
+                        console.log('expiresAt:', expiresAt);
                         if (new Date().getTime() < expiresAt) {
                             setSession(session);
                         } else {
@@ -29,7 +30,7 @@ export default function RootNavigator() {
                             await AsyncStorage.removeItem("customSession");
                         }
                     }
-                }
+                } 
             } catch (error) {
                 console.error("Error checking session:", error);
             } finally {
@@ -41,6 +42,7 @@ export default function RootNavigator() {
         const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
             setSession(session);
         });
+
 
         return () => {
             authListener.subscription.unsubscribe();

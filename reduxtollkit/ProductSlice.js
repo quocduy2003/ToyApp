@@ -3,6 +3,7 @@ import { getToys } from "../services/toy";
 
 const initialState = {
     items: [],
+    selectedItem: null,
     status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
 }
 
@@ -18,7 +19,12 @@ export const getAllProduct = createAsyncThunk(
 const productSlice = createSlice({
     name: 'product',
     initialState,
-    reducers: {},
+    reducers: {
+        getProductById:(state, action)=>{
+            const id= action.payload;
+            state.selectedItem = state.items.find(item => item.id === id);
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getAllProduct.pending, (state) => {

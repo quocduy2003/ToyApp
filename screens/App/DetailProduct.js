@@ -1,22 +1,25 @@
 
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
-import Navbar from '../components/Navbar';
+import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons'; // Nếu chưa có, dùng icon mặc định
 const PRIMARY_COLOR = '#FFC107';
 
 const ProductDetail = ({ route, navigation }) => {
+  const id = route?.params?.id;
+  console.log('id product:', id);
+  
+  const produdct = useSelector((state)=> state.product.sle)
+  // const sampleProduct = {
+  //   name: 'Xe Đồ Chơi Điều Khiển',
+  //   price: 299000,
+  //   description: 'Xe đồ chơi điều khiển từ xa, tốc độ cao, pin sạc, phù hợp cho trẻ em từ 6 tuổi trở lên.',
+  //   image: 'https://bizweb.dktcdn.net/100/418/981/products/1-a5c3dbe3-1a34-4618-b43e-104276627c3c.jpg?v=1755068078660',
+  //   quantity: 12,
+  //   category: 'Dragon ball',
+  // };
 
-  const sampleProduct = {
-    name: 'Xe Đồ Chơi Điều Khiển',
-    price: 299000,
-    description: 'Xe đồ chơi điều khiển từ xa, tốc độ cao, pin sạc, phù hợp cho trẻ em từ 6 tuổi trở lên.',
-    image: 'https://bizweb.dktcdn.net/100/418/981/products/1-a5c3dbe3-1a34-4618-b43e-104276627c3c.jpg?v=1755068078660',
-    quantity: 12,
-    category: 'Dragon ball',
-  };
-
-  const product = route?.params?.product || sampleProduct;
+  // const product = route?.params?.product || sampleProduct;
 
   return (
     <View style={styles.container}>
@@ -57,7 +60,6 @@ const ProductDetail = ({ route, navigation }) => {
         {/* Số lượng và danh mục */}
         <View style={styles.metaBox}>
           <Text style={styles.price}>Giá: {product.price}₫</Text>
-          <Text style={styles.metaText}>Số lượng: {product.quantity}</Text>
           <Text style={styles.metaText}>Danh mục: {product.category}</Text>
         </View>
 
@@ -72,11 +74,9 @@ const ProductDetail = ({ route, navigation }) => {
             <Text style={styles.buyButtonText}>Mua ngay</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Navbar ở dưới cùng */}
       </ScrollView>
 
-      <Navbar />
+
     </View>
   );
 };
@@ -84,7 +84,6 @@ const ProductDetail = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: PRIMARY_COLOR,
     paddingTop: 40,
   },
   topBar: {

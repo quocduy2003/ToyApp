@@ -15,7 +15,7 @@ const MyCarousel = ({ data }) => {
     });
 
     return (
-        <View>
+        <View style={{marginTop:5}}>
             <Carousel
                 width={width}
                 style={{ alignSelf: "center" }}
