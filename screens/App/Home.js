@@ -49,7 +49,6 @@ const Home = () => {
         <View style={{ height: 100, marginTop: 10 }}>
           <FlatList
             style={{ paddingHorizontal: 8 }}
-            data={categories}
             keyExtractor={(item) => item.id}
             horizontal
             renderItem={renderCategory}

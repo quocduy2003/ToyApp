@@ -53,7 +53,7 @@ const Cart = ({ navigation }) => {
 
               <View style={styles.cardContent}>
                 <View style={styles.bodyContent}>
-                  <Text style={styles.nameProdcut} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
+                  <Text style={styles.nameProdcut} numberOfLines={2} ellipsizeMode="tail">{item.name}</Text>
                   <Text style={styles.totalPriceProdcut}>
                     {(item.price * item.quantity).toLocaleString()}đ
                   </Text>
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   elevation: 2,
   borderWidth: 1,
   borderColor: "#FFC107",
-  height: 100, // ✅ chiều cao cố định cho mỗi cart item
+  height: 130, // ✅ chiều cao cố định cho mỗi cart item
 },
 productImage: {
   width: 70,
@@ -213,8 +213,8 @@ productImage: {
   pressIncreaseOperatorContainer: {
     justifyContent: "center",
     alignItems: "center",
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     backgroundColor: "#fff",
     borderBottomLeftRadius: 10,
     borderTopLeftRadius: 10,
@@ -224,8 +224,8 @@ productImage: {
   pressDecreaseOperatorContainer: {
     justifyContent: "center",
     alignItems: "center",
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     backgroundColor: "#fff",
     borderBottomRightRadius: 10,
     borderTopRightRadius: 10,
@@ -235,9 +235,9 @@ productImage: {
   quantity: {
     fontSize: 16,
     textAlign: "center",
-    width: 50,
-    height: 40,
-    lineHeight: 40,
+    width: 35,
+    height: 35,
+    lineHeight: 35,
     borderWidth: 1,
     borderColor: "#BDBDBD",
     backgroundColor: "#fff",

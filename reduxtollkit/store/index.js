@@ -8,7 +8,7 @@ const store = configureStore({
         products: productReducer,
         order: OrderSlice,
         cart: CartSlice,
-      categories: categoryReducer
+        categories: categoryReducer
 
     },
 });
