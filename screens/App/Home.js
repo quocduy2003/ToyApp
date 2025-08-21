@@ -14,8 +14,9 @@ const Home = ({ navigation }) => {
   const dataCategories = useSelector((store) => store.categories.items);
   const categoriesToShow = [
     ...dataCategories.slice(0, 3), // lấy 3 category đầu tiên
-    { id: "all", name: "Tất cả", image: "https://cdn-icons-png.flaticon.com/512/1828/1828778.png" }
+    { id: "4", category_name: "Tất cả", category_image: "https://mxvzzfnncsdukkekbwmn.supabase.co/storage/v1/object/public/images-storage/select-all%20(1).png" }
   ];
+  console.log(categoriesToShow);
   const data = [
     { id: 1, image: "https://picsum.photos/600/400?1" },
     { id: 2, image: "https://picsum.photos/600/400?2" },
@@ -33,35 +34,34 @@ const Home = ({ navigation }) => {
 
   const renderCategory = ({ item }) => (
     <TouchableOpacity style={styles.card}>
-      <Image style={{ width: 45, height: 45 }} source={{ uri: item.image }} />
-      <Text style={styles.title}>{item.name}</Text>
+      <Image style={{ width: 45, height: 45 }} source={{ uri: item.category_image }} />
+      <Text style={styles.title}>{item.category_name}</Text>
     </TouchableOpacity>
   );
 
   return (
     <View style={{ flex: 1 }}>
 
-      <IntroHeader />
+      <IntroHeader navigation={navigation}/>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
 
 
         <MyCarousel data={data} />
 
-        <View style={{ height: 100, marginTop: 10 }}>
+        <View style={{  padding: 10 }}>
           <FlatList
-            style={{ paddingHorizontal: 8 }}
             data={categoriesToShow}
             keyExtractor={(item) => item.id}
             numColumns={4}
             scrollEnabled={false}
             renderItem={renderCategory}
-
+            columnWrapperStyle={{ justifyContent: 'space-between' }}
           />
         </View>
 
         <View style={{ paddingHorizontal: 8, marginTop: 10 }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Sản phẩm mới</Text>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Sản phẩm </Text>
           <FlatList
             data={dataProduct}
             numColumns={2}
@@ -87,12 +87,12 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     backgroundColor: '#fff',
+    borderColor: '#ffc1072d',
+    borderWidth: 1,
     borderRadius: 16,
-    marginRight: 10,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 5,
   },
   title: {
     fontSize: 12,

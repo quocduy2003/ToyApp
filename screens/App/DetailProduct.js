@@ -22,7 +22,6 @@ const ProductDetail = ({ route, navigation }) => {
   const opacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     dispatch(getProductById(id));
   }, [id, dispatch]);
 

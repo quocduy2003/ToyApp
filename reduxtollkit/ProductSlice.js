@@ -4,6 +4,8 @@ import { getToys } from "../services/toy";
 const initialState = {
     items: [],
     selectedItem: null,
+    latestItems: [],
+    searchResults: [],
     status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
 }
 
@@ -15,6 +17,15 @@ export const getAllProduct = createAsyncThunk(
         return data;
     }
 )
+export const searchProductsAsync = createAsyncThunk(
+    '/products/search',
+    async (keyword) => {
+        const data = await searchToys(keyword); // Gọi API tìm kiếm
+        // console.log("searchProductsAsync", data);
+        return data;
+    }
+)
+
 
 const productSlice = createSlice({
     name: 'product',
@@ -22,9 +33,8 @@ const productSlice = createSlice({
     reducers: {
         getProductById: (state, action) => {
             const id = action.payload;
-            console.log('getProductById id:', id);
             state.selectedItem = state.items.find(item => item.id === id);
-            console.log('getProductById product:', state.items.find(item => item.id === id));
+            // console.log('getProductById product:', state.items.find(item => item.id === id));
         }
     },
     extraReducers: (builder) => {
@@ -39,9 +49,21 @@ const productSlice = createSlice({
             })
             .addCase(getAllProduct.rejected, (state) => {
                 state.status = 'failed';
+            })
+            .addCase(searchProductsAsync.pending, (state) => {
+                state.searchStatus = 'loading';
+            })
+            .addCase(searchProductsAsync.fulfilled, (state, action) => {
+                state.searchStatus = 'succeeded';
+                state.searchResults = action.payload;
+                // console.log("searchProductsAsync fulfilled", state.searchResults);
+            })
+            .addCase(searchProductsAsync.rejected, (state) => {
+                state.searchStatus = 'failed';
             });
     }
 })
+
 
 export const { getProductById } = productSlice.actions;
 export default productSlice.reducer;
