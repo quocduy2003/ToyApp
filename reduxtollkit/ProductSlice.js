@@ -49,68 +49,70 @@ export const fetchBestSellers = createAsyncThunk(
 );
 
 const productSlice = createSlice({
-  name: "product",
-  initialState,
-  reducers: {
-    getProductById: (state, action) => {
-      const id = action.payload;
-      state.selectedItem = state.items.find((item) => item.id === id);
+    name: 'product',
+    initialState,
+    reducers: {
+        getProductById: (state, action) => {
+            const id = action.payload;
+            console.log('getProductById id:', id);
+            state.selectedItem = state.items.find(item => item.id === id);
+            console.log('getProductById product:', state.items.find(item => item.id === id));
+        }
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      // getAllProduct
-      .addCase(getAllProduct.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(getAllProduct.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.items = action.payload;
-        // console.log("getAllProduct fulfilled", state.items );
-      })
-      .addCase(getAllProduct.rejected, (state) => {
-        state.status = "failed";
-      })
+    extraReducers: (builder) => {
+        builder
+            // getAllProduct
+            .addCase(getAllProduct.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(getAllProduct.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.items = action.payload;
+                // console.log("getAllProduct fulfilled", state.items );
+            })
+            .addCase(getAllProduct.rejected, (state) => {
+                state.status = "failed";
+            })
 
-      // getNewestProducts
-      .addCase(getNewestProducts.pending, (state) => {
-        state.newestStatus = "loading";
-      })
-      .addCase(getNewestProducts.fulfilled, (state, action) => {
-        state.newestStatus = "succeeded";
-        state.newest = action.payload;
-      })
-      .addCase(getNewestProducts.rejected, (state, action) => {
-        state.newestStatus = "failed";
-        state.error = action.error.message;
-      })
+            // getNewestProducts
+            .addCase(getNewestProducts.pending, (state) => {
+                state.newestStatus = "loading";
+            })
+            .addCase(getNewestProducts.fulfilled, (state, action) => {
+                state.newestStatus = "succeeded";
+                state.newest = action.payload;
+            })
+            .addCase(getNewestProducts.rejected, (state, action) => {
+                state.newestStatus = "failed";
+                state.error = action.error.message;
+            })
 
-      // featured
-      .addCase(getFeaturedProducts.pending, (state) => {
-        state.featuredStatus = "loading";
-      })
-      .addCase(getFeaturedProducts.fulfilled, (state, action) => {
-        state.featuredStatus = "succeeded";
-        state.featured = action.payload;
-      })
-      .addCase(getFeaturedProducts.rejected, (state, action) => {
-        state.featuredStatus = "failed";
-        state.error = action.error.message;
-      })
+            // featured
+            .addCase(getFeaturedProducts.pending, (state) => {
+                state.featuredStatus = "loading";
+            })
+            .addCase(getFeaturedProducts.fulfilled, (state, action) => {
+                state.featuredStatus = "succeeded";
+                state.featured = action.payload;
+            })
+            .addCase(getFeaturedProducts.rejected, (state, action) => {
+                state.featuredStatus = "failed";
+                state.error = action.error.message;
+            })
 
-      // bestSellers
-      .addCase(fetchBestSellers.pending, (state) => {
-        state.bestSellerStatus = "loading";
-      })
-      .addCase(fetchBestSellers.fulfilled, (state, action) => {
-        state.bestSellerStatus = "succeeded";
-        state.bestSellers = action.payload;
-      })
-      .addCase(fetchBestSellers.rejected, (state, action) => {
-        state.bestSellerStatus = "failed";
-        state.error = action.error.message;
-      });
-  },
+            // bestSellers
+            .addCase(fetchBestSellers.pending, (state) => {
+                state.bestSellerStatus = "loading";
+            })
+            .addCase(fetchBestSellers.fulfilled, (state, action) => {
+                state.bestSellerStatus = "succeeded";
+                state.bestSellers = action.payload;
+            })
+            .addCase(fetchBestSellers.rejected, (state, action) => {
+                state.bestSellerStatus = "failed";
+                state.error = action.error.message;
+            });
+    },
 });
 
 export const {

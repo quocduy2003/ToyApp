@@ -90,7 +90,6 @@ const CategoryFull = ({ navigation }) => {
             />
           )}
         </View>
-
         {/* 🥇 Sản phẩm bán chạy */}
         <Text style={styles.sectionTitle}>🥇 Sản phẩm bán chạy</Text>
         {bestSellerStatus === "loading" ? (
@@ -102,7 +101,12 @@ const CategoryFull = ({ navigation }) => {
             horizontal
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
-              <View style={styles.productCard}>
+              <TouchableOpacity
+                style={styles.productCard}
+                onPress={() =>
+                  navigation.navigate("DetailProduct", { id: item.id })
+                }
+              >
                 <Image
                   source={{ uri: item.image }}
                   style={styles.productImage}
@@ -116,54 +120,53 @@ const CategoryFull = ({ navigation }) => {
                 <Text style={{ fontSize: 12, color: "#888" }}>
                   Đã bán: {item.totalQuantity}
                 </Text>
-              </View>
+              </TouchableOpacity>
             )}
           />
         )}
-
         {/* 🆕 Sản phẩm mới nhất */}
         <Text style={styles.sectionTitle}>🆕 Sản phẩm mới nhất</Text>
-        {newestStatus === "loading" ? (
-          <ActivityIndicator size="large" color="#FFC107" />
-        ) : newestStatus === "failed" ? (
-          <Text style={{ color: "red" }}>Lỗi load sản phẩm mới nhất</Text>
-        ) : (
-          <FlatList
-            data={newest}
-            keyExtractor={(item) => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <View style={styles.productCard}>
-                <Image
-                  source={{ uri: item.image }}
-                  style={styles.productImage}
-                />
-                <Text style={styles.productName} numberOfLines={1}>
-                  {item.name}
-                </Text>
-                <Text style={styles.productPrice}>
-                  {item.price.toLocaleString()}đ
-                </Text>
-              </View>
-            )}
-          />
-        )}
-
+        <FlatList
+          data={newest}
+          keyExtractor={(item) => item.id.toString()}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.productCard}
+              onPress={() =>
+                navigation.navigate("DetailProduct", { id: item.id })
+              }
+            >
+              <Image source={{ uri: item.image }} style={styles.productImage} />
+              <Text style={styles.productName} numberOfLines={1}>
+                {item.name}
+              </Text>
+              <Text style={styles.productPrice}>
+                {item.price.toLocaleString()}đ
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
         {/* 🔥 Sản phẩm nổi bật */}
         <Text style={styles.sectionTitle}>🔥 Sản phẩm nổi bật</Text>
         {featuredStatus === "loading" ? (
           <ActivityIndicator size="large" color="#FFC107" />
         ) : featuredStatus === "failed" ? (
-          <Text style={{ color: "red" }}>Lỗi: {error}</Text>
+          <Text style={{ color: "red" }}>Lỗi load sản phẩm nổi bật</Text>
         ) : (
           <FlatList
             data={featured}
-            horizontal
             keyExtractor={(item) => item.id.toString()}
+            horizontal
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
-              <View style={styles.productCard}>
+              <TouchableOpacity
+                style={styles.productCard}
+                onPress={() =>
+                  navigation.navigate("DetailProduct", { id: item.id })
+                }
+              >
                 <Image
                   source={{ uri: item.image }}
                   style={styles.productImage}
@@ -174,7 +177,7 @@ const CategoryFull = ({ navigation }) => {
                 <Text style={styles.productPrice}>
                   {item.price.toLocaleString()}đ
                 </Text>
-              </View>
+              </TouchableOpacity>
             )}
           />
         )}
