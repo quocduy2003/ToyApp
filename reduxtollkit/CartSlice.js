@@ -1,63 +1,40 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchProducts } from "../services/toy";
+import { createSlice } from "@reduxjs/toolkit";
 
-// Async thunk gọi API
-export const getProducts = createAsyncThunk("cart/getProducts", async () => {
-  const data = await fetchProducts();
-  // thêm quantity mặc định = 1 cho từng sản phẩm
-  return data.map((item) => ({
-    ...item,
-    quantity: 1,
-  }));
-});
-
-const CartSlice = createSlice({
+const cartSlice = createSlice({
   name: "cart",
   initialState: {
-    productList: [],
-    loading: false,
-    error: null,
+    productList: [], // ✅ ban đầu giỏ hàng trống
   },
   reducers: {
+    addToCart: (state, action) => {
+      const product = action.payload;
+      const existing = state.productList.find((item) => item.id === product.id);
+      if (existing) {
+        existing.quantity += product.quantity || 1;
+      } else {
+        state.productList.push({ ...product, quantity: product.quantity || 1 });
+      }
+    },
     increaseQuantity: (state, action) => {
-      const item = state.productList.find((p) => p.id === action.payload);
+      const item = state.productList.find((i) => i.id === action.payload);
       if (item) item.quantity += 1;
     },
     decreaseQuantity: (state, action) => {
-      const item = state.productList.find((p) => p.id === action.payload);
+      const item = state.productList.find((i) => i.id === action.payload);
       if (item && item.quantity > 1) item.quantity -= 1;
     },
     removeItem: (state, action) => {
       state.productList = state.productList.filter(
-        (p) => p.id !== action.payload
+        (item) => item.id !== action.payload
       );
     },
     clearCart: (state) => {
       state.productList = [];
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(getProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(getProducts.fulfilled, (state, action) => {
-        state.loading = false;
-        state.productList = action.payload;
-      })
-      .addCase(getProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      });
-  },
 });
 
-export const {
-  increaseQuantity,
-  decreaseQuantity,
-  removeItem,
-  clearCart,
-} = CartSlice.actions;
+export const { addToCart, increaseQuantity, decreaseQuantity, removeItem, clearCart } =
+  cartSlice.actions;
 
-export default CartSlice.reducer;
+export default cartSlice.reducer;

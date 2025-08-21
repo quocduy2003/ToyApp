@@ -13,6 +13,7 @@ const SearchComponent = () => {
           placeholder="Tìm kiếm sản phẩm..."
           placeholderTextColor="#B9D6F3"
         />
+        <Icon name="filter-alt" size={24} color="#FFC107" style={styles.searchIcon} />
       </View>
 
       {/* Avatar/logo */}
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 12,
     // paddingVertical: 8,
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
   },
   searchContainer: {
     flexDirection: "row",

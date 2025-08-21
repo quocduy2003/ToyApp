@@ -1,19 +1,32 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, TextInput, Animated } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
-import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getProductById } from '../../reduxtollkit/ProductSlice';
-const PRIMARY_COLOR = '#FFC107';
-import LottieView from 'lottie-react-native';
+import React, { useEffect, useState, useRef } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Animated,
+} from "react-native";
+import { useSelector, useDispatch } from "react-redux";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import { getProductById } from "../../reduxtollkit/ProductSlice";
+const PRIMARY_COLOR = "#FFC107";
+import LottieView from "lottie-react-native";
+import { addToCart } from "../../reduxtollkit/CartSlice";
 
-const ProductDetail = ({ route, navigation }) => {
+const DetailProduct = ({ route, navigation }) => {
   const [quantity, setQuantity] = useState(1);
   const [loadingPrice, setLoadingPrice] = useState(false);
   const [price, setPrice] = useState(0);
   const [product, setProduct] = useState({});
   const id = route?.params?.id;
-  console.log('id product:', id);
+  console.log("id product:", id);
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
   const isInteracting = useRef(false); // Theo dõi trạng thái tương tác
@@ -32,7 +45,6 @@ const ProductDetail = ({ route, navigation }) => {
       setPrice(selectedItem.price || 0); // Cập nhật giá ban đầu
     }
   }, [selectedItem]);
-
 
   useEffect(() => {
     let newPrice = (product?.price || 0) * quantity;
@@ -58,7 +70,7 @@ const ProductDetail = ({ route, navigation }) => {
         duration: 100,
         useNativeDriver: true,
       }).start();
-      setQuantity(prev => prev + 1);
+      setQuantity((prev) => prev + 1);
     }
   };
 
@@ -70,7 +82,7 @@ const ProductDetail = ({ route, navigation }) => {
         duration: 100,
         useNativeDriver: true,
       }).start();
-      setQuantity(prev => prev - 1);
+      setQuantity((prev) => prev - 1);
     }
   };
 
@@ -86,21 +98,47 @@ const ProductDetail = ({ route, navigation }) => {
   }, [loadingPrice]);
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={28} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Chi tiết sản phẩm</Text>
+      </View>
+
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.imageBox}>
-          <Image source={{ uri: product.image }} style={styles.image} resizeMode="contain" />
+          <Image
+            source={{ uri: product.image }}
+            style={styles.image}
+            resizeMode="contain"
+          />
         </View>
 
         <View style={styles.imageBoxls}>
           <View style={styles.imageBox}>
-            <Image source={{ uri: product.image }} style={styles.imagels} resizeMode="contain" />
+            <Image
+              source={{ uri: product.image }}
+              style={styles.imagels}
+              resizeMode="contain"
+            />
           </View>
           <View style={styles.imageBox}>
-            <Image source={{ uri: product.image }} style={styles.imagels} resizeMode="contain" />
+            <Image
+              source={{ uri: product.image }}
+              style={styles.imagels}
+              resizeMode="contain"
+            />
           </View>
           <View style={styles.imageBox}>
-            <Image source={{ uri: product.image }} style={styles.imagels} resizeMode="contain" />
+            <Image
+              source={{ uri: product.image }}
+              style={styles.imagels}
+              resizeMode="contain"
+            />
           </View>
         </View>
         <View style={styles.productNameTag}>
@@ -112,7 +150,16 @@ const ProductDetail = ({ route, navigation }) => {
 
         <View style={styles.infoBox}>
           <Text style={styles.des}>Mô tả sản phẩm:</Text>
-          <Text style={{ fontSize: 14, fontStyle: 'italic', fontWeight: 'bold', color: '#333' }}>{product.name}</Text>
+          <Text
+            style={{
+              fontSize: 14,
+              fontStyle: "italic",
+              fontWeight: "bold",
+              color: "#333",
+            }}
+          >
+            {product.name}
+          </Text>
           <Text style={styles.description}>{product.description}</Text>
         </View>
         <View style={styles.containerQuantity}>
@@ -136,13 +183,27 @@ const ProductDetail = ({ route, navigation }) => {
         </View>
       </ScrollView>
       <View style={[styles.footer, { paddingBottom: insets.bottom }]}>
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => {
+            dispatch(
+              addToCart({
+                id: product.id,
+                name: product.name,
+                image: product.image,
+                price: product.price,
+                quantity,
+              })
+            );
+            navigation.navigate("Cart");
+          }}
+        >
           {loadingPrice ? (
             <LottieView
-              source={require("../../assets/loading.json")} // file lottie loading
+              source={require("../../assets/loading.json")}
               autoPlay
               loop
-              style={{ width: 100, height: 100, position: 'absolute' }}
+              style={{ width: 100, height: 100, position: "absolute" }}
             />
           ) : (
             <Text style={styles.addText}>
@@ -158,126 +219,147 @@ const ProductDetail = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFC107",
+    height: 80,
+    paddingHorizontal: 15,
+  },
+  backButton: {
+    marginRight: 10,
+    padding: 5,
+    color: "#fff",
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#fff",
+    width: "80%",
+    textAlign: "center",
+  },
+
   imageBox: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 10,
   },
   image: {
-    width: '90%',
+    width: "90%",
     height: 220,
-    backgroundColor: '#fff',
-    borderRadius: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#FFC107",
   },
+
   imageBoxls: {
     paddingHorizontal: 30,
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
+    marginBottom: 10,
   },
   imagels: {
     width: 50,
     height: 50,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    marginLeft: 'auto',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#FFC107",
   },
+
   productNameTag: {
-    padding: 10,
-    paddingVertical: 15,
-    borderRadius: 12,
+    paddingHorizontal: 15,
+    marginTop: 5,
   },
   name: {
-    fontSize: 15,
-    color: '#333',
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#4C4C4C",
   },
+
   metaBox: {
-    justifyContent: 'space-between',
-    padding: 10,
+    paddingHorizontal: 15,
     marginBottom: 10,
   },
   price: {
-    fontSize: 18,
-    color: '#2D6806',
-    marginBottom: 8,
-    fontWeight: 'bold',
+    fontSize: 20,
+    color: "#41B100", // ✅ xanh lá giống Cart
+    fontWeight: "bold",
   },
+
   infoBox: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#cec9c9ff',
-    padding: 10,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    marginBottom: 10,
-    shadowColor: '#000',
-  },
-  description: {
-    fontSize: 13,
-    color: '#555',
-    marginBottom: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    padding: 15,
+    marginHorizontal: 12,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#FFC107",
+    marginBottom: 15,
   },
   des: {
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     fontSize: 18,
+    marginBottom: 6,
   },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#fff',
-    padding: 15,
-    height: 140,
-    alignItems: 'center',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 8,
+  description: {
+    fontSize: 14,
+    color: "#555",
   },
-  addText: {
-    color: '#000000ff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  addButton: {
-    justifyContent: 'center',
-    width: '90%',
-    height: 60,
-    backgroundColor: '#FFC107',
-    paddingVertical: 18,
-    borderRadius: 30,
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
+
   containerQuantity: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginVertical: 20,
-    marginBottom: '35%',
+    gap: 20,
   },
   button: {
-    width: 30,
-    height: 30,
-    borderRadius: 18,
-    backgroundColor: '#ffd64f5f',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 35,
+    height: 35,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#BDBDBD",
   },
   quantity: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
+    width: 40,
+    height: 35,
+    textAlign: "center",
+    lineHeight: 35,
+    borderWidth: 1,
+    borderColor: "#BDBDBD",
+    backgroundColor: "#fff",
+    borderRadius: 8,
+  },
+
+  footer: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+  },
+  addButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: 60,
+    backgroundColor: "#FFC107",
+    borderRadius: 12,
+  },
+  addText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
 
-export default ProductDetail;
+export default DetailProduct;

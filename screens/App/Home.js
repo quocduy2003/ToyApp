@@ -5,13 +5,13 @@ import MyCarousel from '../../components/Home/Carousel'
 import CardIteam from '../../components/Home/CardIteam'
 import { useSelector, useDispatch } from 'react-redux'
 import { getAllProduct } from '../../reduxtollkit/ProductSlice'
-import { fetchCategories } from '../../reduxtollkit/CatagorySlice'
+import { fetchCategories } from '../../reduxtollkit/CategorySlice'
 
 
 const Home = ({ navigation }) => {
   const dispatch = useDispatch();
   const dataProduct = useSelector((store) => store.products.items);
-  const dataCategories = useSelector((store) => store.categories.items);
+  const dataCategories = useSelector((store) => store.categories.items) || [];
   const categoriesToShow = [
     ...dataCategories.slice(0, 3), // lấy 3 category đầu tiên
     { id: "4", category_name: "Tất cả", category_image: "https://mxvzzfnncsdukkekbwmn.supabase.co/storage/v1/object/public/images-storage/select-all%20(1).png" }
@@ -33,7 +33,7 @@ const Home = ({ navigation }) => {
   }, [dispatch]);
 
   const renderCategory = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("CategoryFull")}> 
       <Image style={{ width: 45, height: 45 }} source={{ uri: item.category_image }} />
       <Text style={styles.title}>{item.category_name}</Text>
     </TouchableOpacity>
@@ -67,7 +67,7 @@ const Home = ({ navigation }) => {
             numColumns={2}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => navigation.navigate('ProductDetail', { id: item.id })}>
+              <TouchableOpacity onPress={() => navigation.navigate('DetailProduct', { id: item.id })}>
                 <CardIteam imageUrl={item.image} name={item.name} price={item.price} />
               </TouchableOpacity>
             )}

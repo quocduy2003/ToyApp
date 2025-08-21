@@ -27,7 +27,7 @@ export default Navbar;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: 70,
   },
   navbarContainer: {
     height: 70,
