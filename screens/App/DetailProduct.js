@@ -201,4 +201,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductDetail;
+export default DetailProduct;

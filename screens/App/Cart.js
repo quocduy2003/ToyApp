@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -9,42 +9,24 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Navbar from "../../components/Navbar";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getProducts,
+  increaseQuantity,
+  decreaseQuantity,
+  removeItem,
+} from "../../reduxtollkit/CartSlice";
 
-const Card = ({ navigation }) => {
-  const [productList, setProductList] = useState([
-    {
-      id: "1",
-      name: "Mô Hình OnePiece zoro Chiến Đấu Siêu Ngầu Cao : 33cm nặng : 1000gram - One Piece - Hộp Carton -K14-T4-S3",
-      price: 100000,
-      quantity: 1,
-      image:
-        "https://bizweb.dktcdn.net/100/418/981/products/1-a5c3dbe3-1a34-4618-b43e-104276627c3c.jpg?v=1755068078660",
-    },
-    {
-      id: "2",
-      name: "Mô Hình OnePiece zoro Chiến Đấu Siêu Ngầu Cao : 23.5cm nặng : 1000gram - One Piece - Hộp Màu K17-T4-S7",
-      price: 150000,
-      quantity: 1,
-      image:
-        "https://bizweb.dktcdn.net/100/418/981/products/1-2717f3b8-0397-4ab3-8c5b-6bf183ee82b2.jpg?v=1755138997937",
-    },
-    {
-      id: "3",
-      name: "Mô Hình OnePiece Sanji chiến đấu siêu ngầu Cao : 28.5cm nặng 1800g - One Piece - Full Box - Hộp Màu - K13-T4-S4-S5 (G-12)",
-      price: 120000,
-      quantity: 1,
-      image:
-        "https://bizweb.dktcdn.net/100/418/981/products/1-d9acd1c3-95a7-43f9-aa1f-79c42ab719a3.jpg?v=1755067614440",
-    },
-    {
-      id: "4",
-      name: "Mô Hình OnePiece luffy gear 4 nắm đấm to - cao 20cm - nặng 450gram - Figure One Piece - Hộp Màu - K13-T4-S6",
-      price: 120000,
-      quantity: 1,
-      image:
-        "https://bizweb.dktcdn.net/100/418/981/products/1-1c30b67e-021a-4968-8a3f-eb9914e94ac9.jpg?v=1754995322830",
-    },
-  ]);
+const Cart = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const { productList, loading, error } = useSelector((state) => state.cart);
+
+  useEffect(() => {
+    dispatch(getProducts()); // load dữ liệu từ Supabase khi vào giỏ hàng
+  }, [dispatch]);
+
+  if (loading) return <Text>Đang tải dữ liệu...</Text>;
+  if (error) return <Text>Lỗi: {error}</Text>;
 
   return (
     <View style={styles.container}>
@@ -64,14 +46,14 @@ const Card = ({ navigation }) => {
       <View style={styles.bodyContainer}>
         <FlatList
           data={productList}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={styles.cardItem}>
               <Image source={{ uri: item.image }} style={styles.productImage} />
 
               <View style={styles.cardContent}>
                 <View style={styles.bodyContent}>
-                  <Text style={styles.nameProdcut}>{item.name}</Text>
+                  <Text style={styles.nameProdcut} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
                   <Text style={styles.totalPriceProdcut}>
                     {(item.price * item.quantity).toLocaleString()}đ
                   </Text>
@@ -87,12 +69,14 @@ const Card = ({ navigation }) => {
                   <View style={styles.operatorContainer}>
                     <TouchableOpacity
                       style={styles.pressIncreaseOperatorContainer}
+                      onPress={() => dispatch(decreaseQuantity(item.id))}
                     >
                       <Text>-</Text>
                     </TouchableOpacity>
                     <Text style={styles.quantity}>{item.quantity}</Text>
                     <TouchableOpacity
                       style={styles.pressDecreaseOperatorContainer}
+                      onPress={() => dispatch(increaseQuantity(item.id))}
                     >
                       <Text>+</Text>
                     </TouchableOpacity>
@@ -100,6 +84,7 @@ const Card = ({ navigation }) => {
                   <View style={styles.deleteContainer}>
                     <TouchableOpacity
                       style={styles.pressDeleteOperatorContainer}
+                      onPress={() => dispatch(removeItem(item.id))}
                     >
                       <Text style={styles.textDelete}>Xoá</Text>
                     </TouchableOpacity>
@@ -115,7 +100,12 @@ const Card = ({ navigation }) => {
       <View style={styles.footerContainer}>
         <View style={styles.paymentTextContainer}>
           <Text style={styles.paymentText}>Tổng</Text>
-          <Text style={styles.paymentText}>đ</Text>
+          <Text style={styles.paymentText}>
+            {productList
+              .reduce((sum, item) => sum + item.price * item.quantity, 0)
+              .toLocaleString()}
+            đ
+          </Text>
         </View>
       </View>
 
@@ -134,7 +124,7 @@ const Card = ({ navigation }) => {
   );
 };
 
-export default Card;
+export default Cart;
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
@@ -162,38 +152,45 @@ const styles = StyleSheet.create({
   },
   bodyContainer: { flex: 9 },
   cardItem: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    marginHorizontal: 12,
-    marginVertical: 8,
-    padding: 12,
-    borderRadius: 12,
-    shadowColor: "#FFC107",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: "#FFC107",
-  },
-  productImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    marginRight: 12,
-  },
-  cardContent: { flex: 1 },
+  flexDirection: "row",
+  backgroundColor: "#fff",
+  marginHorizontal: 12,
+  marginVertical: 6,
+  padding: 10,
+  borderRadius: 10,
+  shadowColor: "#FFC107",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 3,
+  elevation: 2,
+  borderWidth: 1,
+  borderColor: "#FFC107",
+  height: 100, // ✅ chiều cao cố định cho mỗi cart item
+},
+productImage: {
+  width: 70,
+  height: 70,
+  borderRadius: 8,
+  marginRight: 10,
+  alignSelf: "center", // ✅ căn giữa theo chiều dọc
+},
+  cardContent: {
+  flex: 1,
+  justifyContent: "space-between", // ✅ để nội dung không bị dính sát nhau
+},
   bodyContent: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 6,
   },
   nameProdcut: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#4C4C4C",
-    flexShrink: 1,
-  },
+  fontSize: 16,
+  fontWeight: "bold",
+  color: "#4C4C4C",
+  flexShrink: 1,
+  numberOfLines: 1, // ✅ chỉ hiển thị 1 dòng
+  ellipsizeMode: "tail", // ✅ nếu dài quá thì thêm "..."
+},
   totalPriceProdcut: {
     fontSize: 18,
     color: "#41B100",

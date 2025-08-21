@@ -15,8 +15,24 @@ export const getToyById = async (id) => {
   return data;
 };
 
+export const fetchProducts = async () => {
+  const { data, error } = await supabase.from("products").select("*");
+  if (error) throw error;
+  return data;
+};
 
-//get catagory
+// lấy sản phẩm theo id
+export const fetchProductById = async (id) => {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) throw error;
+  return data;
+};
+
+
 export const getCategories = async () => {
   const {data, error} = await supabase.from('categories').select('*');
   // console.log('categories:', data);
