@@ -20,9 +20,11 @@ const productSlice = createSlice({
     name: 'product',
     initialState,
     reducers: {
-        getProductById:(state, action)=>{
-            const id= action.payload;
+        getProductById: (state, action) => {
+            const id = action.payload;
+            console.log('getProductById id:', id);
             state.selectedItem = state.items.find(item => item.id === id);
+            console.log('getProductById product:', state.items.find(item => item.id === id));
         }
     },
     extraReducers: (builder) => {
@@ -41,5 +43,5 @@ const productSlice = createSlice({
     }
 })
 
-export const { addProduct, removeProduct, clearError, resetStatus } = productSlice.actions;
+export const { getProductById } = productSlice.actions;
 export default productSlice.reducer;
