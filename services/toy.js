@@ -43,7 +43,7 @@ export const searchToys = async (keyword) => {
   const { data, error } = await supabase
     .from('products')
     .select('*')
-    .or(`name.ilike.*${trimmedKeyword}*`)
+    .or(`name..*${trimmedKeyword}*`)
     .limit(8);
 
   if (error) {

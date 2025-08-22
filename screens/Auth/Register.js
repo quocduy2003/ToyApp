@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { supabase } from '../../config/supabase';
+
 const PRIMARY_COLOR = "#FFC107";
 
-// Hàm hash mật khẩu (giả định, bạn cần tích hợp thư viện như bcrypt)
-
-const Register = ({ navigation }) => {
+const Register = ({ navigation, route }) => {
     const [full_name, setFull_name] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
@@ -14,6 +14,9 @@ const Register = ({ navigation }) => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+
+    // Kiểm tra xem có phải đang mở như modal không
+    const isModal = route?.name === 'RegisterModal';
 
 const handleRegister = async () => {
     setError("");
@@ -52,7 +55,11 @@ const handleRegister = async () => {
                 setError(insertError.message);
             } else {
                 alert("Thành công", "Đăng ký thành công, vui lòng kiểm tra email để xác nhận!");
-                navigation.navigate("Login");
+                if (isModal) {
+                    navigation.navigate("LoginModal");
+                } else {
+                    navigation.navigate("Login");
+                }
             }
         }
     } catch (err) {
@@ -64,6 +71,15 @@ const handleRegister = async () => {
 
     return (
         <View style={styles.container}>
+            {isModal && (
+                <TouchableOpacity 
+                    style={styles.closeButton}
+                    onPress={() => navigation.goBack()}
+                >
+                    <Ionicons name="close" size={24} color="white" />
+                </TouchableOpacity>
+            )}
+            
             <View style={styles.boxContainer}>
                 <View style={styles.header}>
                     <Text style={styles.headerText}>Đăng Ký</Text>
@@ -131,7 +147,13 @@ const handleRegister = async () => {
 
                     <TouchableOpacity
                         style={styles.switchMode}
-                        onPress={() => navigation.navigate("Login")}
+                        onPress={() => {
+                            if (isModal) {
+                                navigation.navigate("LoginModal");
+                            } else {
+                                navigation.navigate("Login");
+                            }
+                        }}
                     >
                         <Text style={styles.switchText}>
                             Already have an account? Login
@@ -151,6 +173,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: PRIMARY_COLOR,
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 50,
+        right: 20,
+        zIndex: 1,
+        padding: 10,
     },
     boxContainer: {
         width: '100%',

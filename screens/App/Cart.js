@@ -1,18 +1,17 @@
-import React from "react";
 import {
   FlatList,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Image,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
-import Navbar from "../../components/Navbar";
 import { useDispatch, useSelector } from "react-redux";
+import HeaderAuth from "../../components/HeaderAuth";
+import Navbar from "../../components/Navbar";
 import {
-  increaseQuantity,
   decreaseQuantity,
+  increaseQuantity,
   removeItem,
 } from "../../reduxtollkit/CartSlice";
 
@@ -23,16 +22,7 @@ const Cart = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.headerContainer}>
-        <Icon
-          name="arrow-back"
-          style={styles.arrowBack}
-          onPress={() => navigation.goBack()}
-        />
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Giỏ hàng</Text>
-        </View>
-      </View>
+      <HeaderAuth title="Giỏ hàng" />
 
       {/* Danh sách sản phẩm */}
       <View style={styles.bodyContainer}>

@@ -1,39 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { supabase } from '../../config/supabase';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { loginUser } from '../../reduxtollkit/UserSlice';
 
 const PRIMARY_COLOR = "#FFC107";
 
-const Login = ({ navigation }) => {
+const Login = ({ navigation, route }) => {
     const [email, setEmail] = useState(""); // Sử dụng email thay vì username
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    
+    const dispatch = useDispatch();
+    const userState = useSelector((state) => state.user);
+    const { loading, error, isLoggedIn } = userState || { loading: false, error: null, isLoggedIn: false };
+
+    // Kiểm tra xem có phải đang mở như modal không
+    const isModal = route?.name === 'LoginModal';
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            if (isModal) {
+                // Nếu là modal, đóng modal và quay về màn hình trước
+                navigation.goBack();
+            } else {
+                // Nếu không phải modal, navigate bình thường
+                navigation.navigate("Home");
+            }
+        }
+    }, [isLoggedIn, navigation, isModal]);
 
     const handleLogin = async () => {
+        if (!email || !password) {
+            return;
+        }
+
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
-
-            if (error) {
-                setError(error.message);
-                return;
-            }
-
-            const session = data.session;
-            const expiresAt = new Date().getTime() + 3 * 24 * 60 * 60 * 1000; // 2.5 giờ
-            console.log('expiresAt:', expiresAt);
-            await AsyncStorage.setItem(
-                "customSession",
-                JSON.stringify({ access_token: session.access_token, expiresAt })
-            );
-
-            navigation.navigate("Home");
+            await dispatch(loginUser({ email, password })).unwrap();
         } catch (err) {
-            setError("Lỗi kết nối. Vui lòng thử lại.");
             console.error("Login error:", err);
         }
     };
@@ -43,6 +46,15 @@ const Login = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            {isModal && (
+                <TouchableOpacity 
+                    style={styles.closeButton}
+                    onPress={() => navigation.goBack()}
+                >
+                    <Ionicons name="close" size={24} color="white" />
+                </TouchableOpacity>
+            )}
+            
             <View style={styles.boxContainer}>
                 <View style={styles.header}>
                     <Text style={styles.headerText}>Đăng nhập</Text>
@@ -70,13 +82,21 @@ const Login = ({ navigation }) => {
                         />
                     </View>
 
-                    <TouchableOpacity style={styles.boxTextLogin} onPress={handleLogin}>
-                        <Text style={styles.bodyTextLogin}>Đăng nhập</Text>
+                    <TouchableOpacity style={styles.boxTextLogin} onPress={handleLogin} disabled={loading}>
+                        <Text style={styles.bodyTextLogin}>
+                            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+                        </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         style={styles.switchMode}
-                        onPress={() => navigation.navigate("Register")}
+                        onPress={() => {
+                            if (isModal) {
+                                navigation.navigate("RegisterModal");
+                            } else {
+                                navigation.navigate("Register");
+                            }
+                        }}
                     >
                         <Text style={styles.switchText}>
                             Chưa có tài khoản? Đăng ký ngay
@@ -84,7 +104,7 @@ const Login = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            {error && <Text style={{ color: 'red' }}>{error}</Text>}
+            {error && <Text style={{ color: 'red', textAlign: 'center', marginTop: 10 }}>{error}</Text>}
         </View>
     );
 };
@@ -97,6 +117,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: PRIMARY_COLOR,
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 50,
+        right: 20,
+        zIndex: 1,
+        padding: 10,
     },
     boxContainer: {
         width: '100%',
