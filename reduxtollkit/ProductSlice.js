@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getToys } from "../services/toy";
+import { getToys, searchToys } from "../services/toy";
 import { getNewestToys, fetchFeaturedProducts, getBestSellerProducts } from "../services/category";
 
 const initialState = {

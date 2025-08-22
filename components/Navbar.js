@@ -1,10 +1,11 @@
-import * as React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native'; // thêm
+import { useAuthNavigation } from '../utils/navigation';
 
 const Navbar = () => {
-  const navigation = useNavigation(); // lấy navigation từ hook
+  const navigation = useNavigation();
+  const { isLoggedIn, navigateToLogin, navigateToRegister, navigateToProfile } = useAuthNavigation();
 
   return (
     <View style={styles.container}>
@@ -18,6 +19,30 @@ const Navbar = () => {
         <TouchableOpacity onPress={() => navigation.navigate("Cart")}>
           <Icon name="cart" size={30} color="#FFC107" />
         </TouchableOpacity>
+
+        {/* Conditional rendering based on login status */}
+        {isLoggedIn ? (
+          /* Icon Profile - hiển thị khi đã đăng nhập */
+          <TouchableOpacity onPress={navigateToProfile}>
+            <Icon name="person" size={30} color="#FFC107" />
+          </TouchableOpacity>
+        ) : (
+          /* Nút đăng nhập/đăng ký - hiển thị khi chưa đăng nhập */
+          <View style={styles.authButtonsContainer}>
+            <TouchableOpacity 
+              style={styles.loginButton} 
+              onPress={navigateToLogin}
+            >
+              <Text style={styles.authButtonText}>Đăng nhập</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.registerButton} 
+              onPress={navigateToRegister}
+            >
+              <Text style={styles.authButtonText}>Đăng ký</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -41,5 +66,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'absolute',
     bottom: 0,
+  },
+  authButtonsContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  loginButton: {
+    backgroundColor: '#FFC107',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+  },
+  registerButton: {
+    backgroundColor: '#2D6806',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+  },
+  authButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });

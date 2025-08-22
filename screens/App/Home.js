@@ -1,11 +1,12 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native'
-import React, { use, useEffect, useState } from 'react'
-import IntroHeader from '../../components/Home/IntroHeader'
-import MyCarousel from '../../components/Home/Carousel'
+import { useEffect } from 'react'
+import { FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
 import CardIteam from '../../components/Home/CardIteam'
-import { useSelector, useDispatch } from 'react-redux'
-import { getAllProduct } from '../../reduxtollkit/ProductSlice'
+import MyCarousel from '../../components/Home/Carousel'
+import IntroHeader from '../../components/Home/IntroHeader'
+import Navbar from '../../components/Navbar'
 import { fetchCategories } from '../../reduxtollkit/CategorySlice'
+import { getAllProduct } from '../../reduxtollkit/ProductSlice'
 
 
 const Home = ({ navigation }) => {
@@ -86,6 +87,8 @@ const Home = ({ navigation }) => {
           />
         </View>
       </ScrollView>
+      
+      <Navbar />
     </View>
   )
 }
